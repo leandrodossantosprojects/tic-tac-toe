@@ -8,16 +8,22 @@ function Gameboard() {
   }
 
   const getBoard = () => board;
+
   const selectCell = (row, column, player) => {
     if (board[row][column].getValue() !== 0) {
-      return;
-    } else board[row][column].addToken(player);
+      return false;
+    } else {
+      board[row][column].addToken(player);
+      return true;
+    }
   };
   const printBoard = () => {
     const boardWithCellValues = board.map((row) =>
       row.map((cell) => cell.getValue()),
     );
-    console.log(boardWithCellValues);
+    console.log(boardWithCellValues[0]);
+    console.log(boardWithCellValues[1]);
+    console.log(boardWithCellValues[2]);
   };
 
   return {
@@ -45,11 +51,11 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
   const players = [
     {
       name: playerOneName,
-      token: "X",
+      token: 1,
     },
     {
       name: playerTwoName,
-      token: "O",
+      token: 2,
     },
   ];
   let activePlayer = players[0];
@@ -73,8 +79,15 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
           such as a win message. */
 
     // Switch player turn
-    switchPlayerTurn();
-    printNewRound();
+    if (round === true) {
+      switchPlayerTurn();
+      printNewRound();
+    } else {
+      console.log(
+        `${getActivePlayer().name} can't select ocuppied cell, select other cell`,
+      );
+      return;
+    }
   };
 
   // Initial play game message
@@ -92,3 +105,4 @@ const game = Gameflow();
 
 game.playRound(1, 2);
 game.playRound(1, 2);
+game.playRound(0, 2);
