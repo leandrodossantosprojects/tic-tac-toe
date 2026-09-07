@@ -70,7 +70,11 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
     console.log(`${getActivePlayer().name}'s turn.`);
   };
 
+  let gameOver = false;
+
   const playRound = (row, column) => {
+    if (gameOver === true) return;
+
     // Drop a token for the current player
     console.log(`${getActivePlayer().name} select a empty cell`);
 
@@ -80,8 +84,12 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
 
     // Switch player turn
     if (round === true) {
-      switchPlayerTurn();
-      printNewRound();
+      if (jugadaGanadora(board, getActivePlayer().name) === true)
+        gameOver = true;
+      else {
+        switchPlayerTurn();
+        printNewRound();
+      }
     } else {
       console.log(
         `${getActivePlayer().name} can't select ocuppied cell, select other cell`,
@@ -101,8 +109,31 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
   };
 }
 
+const jugadaGanadora = (gameboard, player) => {
+  const gameBoard = gameboard.getBoard();
+  const boardWithCellValues = gameBoard.map((row) =>
+    row.map((cell) => cell.getValue()),
+  );
+  if (
+    boardWithCellValues[0][0] !== 0 &&
+    boardWithCellValues[0][0] === boardWithCellValues[0][1] &&
+    boardWithCellValues[0][2] === boardWithCellValues[0][1]
+  ) {
+    gameboard.printBoard();
+    console.log(`${player} win`);
+    return true;
+  } else {
+    return false;
+  }
+};
+
 const game = Gameflow();
 
 game.playRound(1, 2);
 game.playRound(1, 2);
 game.playRound(0, 2);
+game.playRound(2, 2);
+game.playRound(0, 1);
+game.playRound(1, 1);
+game.playRound(0, 0);
+game.playRound(2, 0);
