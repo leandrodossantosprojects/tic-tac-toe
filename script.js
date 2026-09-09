@@ -17,6 +17,7 @@ function Gameboard() {
       return true;
     }
   };
+
   const printBoard = () => {
     const boardWithCellValues = board.map((row) =>
       row.map((cell) => cell.getValue()),
@@ -26,10 +27,16 @@ function Gameboard() {
     console.log(boardWithCellValues[2]);
   };
 
+  const getCellValue = (row, column) => {
+    const values = board[row][column].getValue();
+    return values;
+  };
+
   return {
     getBoard,
     printBoard,
     selectCell,
+    getCellValue,
   };
 }
 
