@@ -91,8 +91,7 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
 
     // Switch player turn
     if (round === true) {
-      if (jugadaGanadora(board, getActivePlayer().name) === true)
-        gameOver = true;
+      if (jugadaGanadora(board, getActivePlayer()) === true) gameOver = true;
       else {
         switchPlayerTurn();
         printNewRound();
@@ -117,17 +116,14 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
 }
 
 const jugadaGanadora = (gameboard, player) => {
-  const gameBoard = gameboard.getBoard();
-  const boardWithCellValues = gameBoard.map((row) =>
-    row.map((cell) => cell.getValue()),
-  );
   if (
-    boardWithCellValues[0][0] !== 0 &&
-    boardWithCellValues[0][0] === boardWithCellValues[0][1] &&
-    boardWithCellValues[0][2] === boardWithCellValues[0][1]
+    gameboard.getCellValue(0, 0) !== 0 &&
+    gameboard.getCellValue(0, 0) === player.token &&
+    gameboard.getCellValue(0, 1) === player.token &&
+    gameboard.getCellValue(0, 2) === player.token
   ) {
     gameboard.printBoard();
-    console.log(`${player} win`);
+    console.log(`${player.name} win`);
     return true;
   } else {
     return false;
