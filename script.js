@@ -115,6 +115,13 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
   };
 }
 
+/* 
+ Debería crear un objeto con las jugadas ganadoras.
+ Luego debo crear una funcion que revise las jugadas según donde coloco el token
+ así no reviso todas las jugadas en cada round.
+ Luego usar la funcion dentro de Gameflow().
+ */
+
 const jugadaGanadora = (gameboard, player) => {
   if (
     gameboard.getCellValue(0, 0) !== 0 &&
