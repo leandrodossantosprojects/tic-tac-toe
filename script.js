@@ -79,6 +79,49 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
 
   let gameOver = false;
 
+  const winPlays = [
+    [
+      [0, 0],
+      [0, 1],
+      [0, 2],
+    ],
+    [
+      [1, 0],
+      [1, 1],
+      [1, 2],
+    ],
+    [
+      [2, 0],
+      [2, 1],
+      [2, 2],
+    ],
+    [
+      [0, 0],
+      [1, 0],
+      [2, 0],
+    ],
+    [
+      [0, 1],
+      [1, 1],
+      [2, 1],
+    ],
+    [
+      [0, 2],
+      [1, 2],
+      [2, 2],
+    ],
+    [
+      [0, 0],
+      [1, 1],
+      [2, 2],
+    ],
+    [
+      [2, 0],
+      [1, 1],
+      [0, 2],
+    ],
+  ];
+
   const playRound = (row, column) => {
     if (gameOver === true) return;
 
@@ -88,10 +131,15 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
     let round = board.selectCell(row, column, getActivePlayer().token);
     /*  This is where we would check for a winner and handle that logic,
           such as a win message. */
+    const winner = winPlays.some((play) => {
+      return play.every(([row, column]) => {
+        return board.getCellValue(row, column) === getActivePlayer().token;
+      });
+    });
 
     // Switch player turn
     if (round === true) {
-      if (jugadaGanadora(board, getActivePlayer()) === true) gameOver = true;
+      if (winner === true) gameOver = true;
       else {
         switchPlayerTurn();
         printNewRound();
@@ -123,11 +171,14 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
  */
 
 const jugadaGanadora = (gameboard, player) => {
+  function getCell(a, b) {
+    return gameboard.getCellValue(a, b);
+  }
+  const token = player.token;
   if (
-    gameboard.getCellValue(0, 0) !== 0 &&
-    gameboard.getCellValue(0, 0) === player.token &&
-    gameboard.getCellValue(0, 1) === player.token &&
-    gameboard.getCellValue(0, 2) === player.token
+    getCell(0, 0) === token &&
+    getCell(0, 1) === token &&
+    getCell(0, 2) === token
   ) {
     gameboard.printBoard();
     console.log(`${player.name} win`);
@@ -140,10 +191,8 @@ const jugadaGanadora = (gameboard, player) => {
 const game = Gameflow();
 
 game.playRound(1, 2);
-game.playRound(1, 2);
-game.playRound(0, 2);
+game.playRound(0, 0);
 game.playRound(2, 2);
 game.playRound(0, 1);
 game.playRound(1, 1);
-game.playRound(0, 0);
-game.playRound(2, 0);
+game.playRound(0, 2);
