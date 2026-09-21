@@ -174,3 +174,28 @@ game.playRound(2, 2);
 game.playRound(0, 1);
 game.playRound(1, 1);
 game.playRound(0, 2);
+
+const DisplayBoard = () => {
+  const render = (board) => {
+    const gameBoard = document.createElement("div");
+    gameBoard.className = "board";
+    const display = document.querySelector("html");
+    display.appendChild(gameBoard);
+    for (let i = 0; i < 3; i++) {
+      const boardRow = document.createElement("div");
+      boardRow.className = "board-row";
+      gameBoard.appendChild(boardRow);
+      for (let j = 0; j < 3; j++) {
+        const boardCell = document.createElement("div");
+        boardCell.className = "board-cell";
+        boardCell.innerText = `${board.getCellValue(i, j)}`;
+        boardRow.appendChild(boardCell);
+      }
+    }
+  };
+  return {
+    render,
+  };
+};
+
+DisplayBoard().render(Gameboard());
