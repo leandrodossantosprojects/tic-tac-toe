@@ -53,6 +53,31 @@ function Cell() {
   };
 }
 
+const DisplayBoard = () => {
+  const renderBoard = (board) => {
+    const display = document.querySelector("html");
+    const gameBoard = document.createElement("div");
+    display.innerHTML = "";
+    display.appendChild(gameBoard);
+    gameBoard.className = "board";
+    for (let i = 0; i < 3; i++) {
+      const boardRow = document.createElement("div");
+      boardRow.className = "board-row";
+      gameBoard.appendChild(boardRow);
+      for (let j = 0; j < 3; j++) {
+        const boardCell = document.createElement("div");
+        boardCell.className = "board-cell";
+        boardCell.innerText = `${board.getCellValue(i, j)}`;
+        boardRow.appendChild(boardCell);
+      }
+    }
+  };
+
+  return {
+    renderBoard,
+  };
+};
+
 function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
   const board = Gameboard();
   const players = [
@@ -144,6 +169,7 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
         console.log(`${getActivePlayer().name} won`);
         return;
       } else {
+        DisplayBoard().renderBoard(board);
         switchPlayerTurn();
         printNewRound();
       }
@@ -174,28 +200,3 @@ game.playRound(2, 2);
 game.playRound(0, 1);
 game.playRound(1, 1);
 game.playRound(0, 2);
-
-const DisplayBoard = () => {
-  const render = (board) => {
-    const gameBoard = document.createElement("div");
-    gameBoard.className = "board";
-    const display = document.querySelector("html");
-    display.appendChild(gameBoard);
-    for (let i = 0; i < 3; i++) {
-      const boardRow = document.createElement("div");
-      boardRow.className = "board-row";
-      gameBoard.appendChild(boardRow);
-      for (let j = 0; j < 3; j++) {
-        const boardCell = document.createElement("div");
-        boardCell.className = "board-cell";
-        boardCell.innerText = `${board.getCellValue(i, j)}`;
-        boardRow.appendChild(boardCell);
-      }
-    }
-  };
-  return {
-    render,
-  };
-};
-
-DisplayBoard().render(Gameboard());
