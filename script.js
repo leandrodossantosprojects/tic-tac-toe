@@ -32,11 +32,18 @@ function Gameboard() {
     return values;
   };
 
+  const cleanBoard = () => {
+    board.forEach((row) => {
+      row.forEach((cell) => cell.cleanValue());
+    });
+  };
+
   return {
     getBoard,
     printBoard,
     selectCell,
     getCellValue,
+    cleanBoard,
   };
 }
 
@@ -46,12 +53,33 @@ function Cell() {
     value = player;
   };
   const getValue = () => value;
+  const cleanValue = () => (value = 0);
 
   return {
     addToken,
     getValue,
+    cleanValue,
   };
 }
+
+const DisplayMarker = () => {
+  const renderMarkers = () => {
+    const display = document.querySelector("html");
+    const markerContainer = document.createElement("div");
+    const player1Marker = document.createElement("div");
+    const player2Marker = document.createElement("div");
+    markerContainer.innerHTML = `${player1Marker} <div class='versus'>VS</div> ${player2Marker}`;
+    player1Marker.className = "marker-p1";
+    player1Marker.innerText = "0";
+    player2Marker.className = "marker-p2";
+    player2Marker.innerText = "0";
+    display.appendChild(markerContainer);
+  };
+
+  return {
+    renderMarkers,
+  };
+};
 
 const DisplayBoard = () => {
   const renderBoard = (board) => {
@@ -84,10 +112,12 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
     {
       name: playerOneName,
       token: 1,
+      wins: 0,
     },
     {
       name: playerTwoName,
       token: 2,
+      wins: 0,
     },
   ];
   let activePlayer = players[0];
@@ -147,56 +177,71 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
     ],
   ];
 
-  const playRound = (row, column) => {
+  const playGame = (row, column) => {
     //Verify if game is over
     if (gameOver === true) return;
-    // Drop a token for the current player
     console.log(`${getActivePlayer().name} select a empty cell`);
 
-    let round = board.selectCell(row, column, getActivePlayer().token);
-    /*  This is where we would check for a winner and handle that logic,
-          such as a win message. */
+    let move = board.selectCell(row, column, getActivePlayer().token);
+
+    if (move === false) return;
+
     const winner = winPlays.some((play) => {
       return play.every(([x, y]) => {
         return board.getCellValue(x, y) === getActivePlayer().token;
       });
     });
 
-    // Switch player turn
-    if (round === true) {
-      if (winner === true) {
+    const gameIsOver = () =>
+      board
+        .getBoard()
+        .every((row) => row.every((cell) => cell.getValue() !== 0));
+
+    if (winner === true) {
+      console.log(`${getActivePlayer().name} won this game`);
+      getActivePlayer().wins += 1;
+      board.printBoard();
+      if (getActivePlayer().wins === 2) {
+        console.log(`${getActivePlayer().name} won this match`);
         gameOver = true;
-        console.log(`${getActivePlayer().name} won`);
         return;
-      } else {
-        DisplayBoard().renderBoard(board);
-        switchPlayerTurn();
-        printNewRound();
       }
-    } else {
-      console.log(
-        `${getActivePlayer().name} can't select ocuppied cell, select other cell`,
-      );
-      return;
+      board.cleanBoard();
     }
+    if (gameIsOver() === true) {
+      console.log("Draw game");
+      board.cleanBoard();
+    }
+    switchPlayerTurn();
+    printNewRound();
   };
 
-  // Initial play game message
-  printNewRound();
-
-  // For the console version, we will only use playRound, but we will need
-  // getActivePlayer for the UI version, so I'm revealing it now
   return {
-    playRound,
+    playGame,
     getActivePlayer,
   };
 }
 
 const game = Gameflow();
 
-game.playRound(1, 2);
-game.playRound(0, 0);
-game.playRound(2, 2);
-game.playRound(0, 1);
-game.playRound(1, 1);
-game.playRound(0, 2);
+// Game 1: Player 2 wins
+game.playGame(1, 2);
+game.playGame(0, 0);
+game.playGame(2, 2);
+game.playGame(0, 1);
+game.playGame(1, 1);
+game.playGame(0, 2);
+
+// Game 2: Player 1 wins
+game.playGame(0, 0);
+game.playGame(1, 0);
+game.playGame(0, 1);
+game.playGame(1, 1);
+game.playGame(0, 2);
+
+// Game 3: Player 2 wins the match
+game.playGame(2, 0);
+game.playGame(0, 0);
+game.playGame(2, 1);
+game.playGame(0, 1);
+game.playGame(2, 2);
