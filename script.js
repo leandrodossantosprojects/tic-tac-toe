@@ -83,9 +83,8 @@ const DisplayMarker = () => {
 
 const DisplayBoard = () => {
   const renderBoard = (board) => {
-    const display = document.querySelector("html");
+    const display = document.querySelector("body");
     const gameBoard = document.createElement("div");
-    display.innerHTML = "";
     display.appendChild(gameBoard);
     gameBoard.className = "board";
     for (let i = 0; i < 3; i++) {
