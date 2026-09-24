@@ -70,6 +70,43 @@ const renderDOM = () => {
   const p2Marker = document.createElement("div");
   const p2Name = document.createElement("p");
   const vsText = document.createElement("div");
+  //const svgX = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none">
+  //    <path
+  //      d="M18 6L6 18M6 6l12 12"
+  //      stroke="#06b6d4"
+  //      stroke-width="2.5"
+  //      stroke-linecap="round"
+  //      stroke-linejoin="round"
+  //      filter="url(#neon-glow)"
+  //    />
+  //  </svg>`;
+  //const svgO = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none">
+  //  <circle
+  //    cx="12"
+  //    cy="12"
+  //    r="8.5"
+  //    stroke="#06b6d4"
+  //    stroke-width="2.5"
+  //    filter="url(#neon-glow)"
+  //  />
+  //</svg>`;
+  //const svgXGlow = `
+  //  <defs>
+  //    <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
+  //      <feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="#06b6d4" flood-opacity="0.9" />
+  //      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#06b6d4" flood-opacity="0.5" />
+  //    </filter>
+  //  </defs>
+  //`;
+  //const svgOGlow = `
+  //  <defs>
+  //    <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
+  //      <feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="#06b6d4" flood-opacity="0.9" />
+  //      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#06b6d4" flood-opacity="0.5" />
+  //    </filter>
+  //  </defs>
+  //
+  //`;
 
   p1Marker.className = "marker";
   p1Marker.id = "p1-marker";
@@ -123,10 +160,18 @@ const renderDOM = () => {
     display.appendChild(winnerModal);
   };
 
+  const cleanRenderedBoard = () => {
+    const cells = document.getElementsByClassName("board-cell");
+    for (let i = 0; i < cells.length; i++) {
+      i.innerHTML = "";
+    }
+  };
+
   return {
     renderMarkers,
     renderBoard,
     renderWinner,
+    cleanRenderedBoard,
   };
 };
 
