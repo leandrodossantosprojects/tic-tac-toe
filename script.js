@@ -92,7 +92,7 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
     console.log(`${getActivePlayer().name}'s turn.`);
   };
 
-  let gameOver = false;
+  let matchOver = false;
   let winner = "";
 
   const winPlays = [
@@ -138,13 +138,12 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
     ],
   ];
 
-  const playGame = (row, column) => {
+  const playMatch = (row, column) => {
     //Verify if game is over
-    if (gameOver === true) return;
+    if (matchOver === true) return;
+
     console.log(`${getActivePlayer().name} select a empty cell`);
-
     let move = board.selectCell(row, column, getActivePlayer().token);
-
     if (move === false) return;
 
     const won = winPlays.some((play) => {
@@ -160,10 +159,9 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
     };
 
     if (won === true) {
-      console.log(`${getActivePlayer().name} won this game`);
       getActivePlayer().gamesWon += 1;
       board.printBoard();
-      gameOver = true;
+      matchOver = true;
       if (getActivePlayer().gamesWon === 2) {
         console.log(`${getActivePlayer().name} won this match`);
         winner = getActivePlayer().name;
@@ -175,7 +173,7 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
     if (drawGame() === true) {
       console.log("Draw game");
       board.cleanBoard();
-      gameOver = true;
+      matchOver = true;
       return;
     }
     switchPlayerTurn();
@@ -184,17 +182,28 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
 
   const getStatus = () => {
     return {
-      gameOver: gameOver,
+      matchOver: matchOver,
       winner: winner,
     };
   };
 
+  const changeMatchOver = () => {
+    matchOver = false;
+  };
+
+  const changeGameOver = () => {
+    winner = "";
+    players.forEach((player) => (player.gamesWon = 0));
+  };
+
   return {
-    playGame,
+    playMatch,
     getBoard,
     getPlayers,
     getActivePlayer,
     getStatus,
+    changeGameOver,
+    changeMatchOver,
   };
 }
 
@@ -202,8 +211,10 @@ const renderDOM = () => {
   const display = document.querySelector("body");
   const main = document.createElement("main");
   const p1Marker = document.createElement("div");
+  const p1Wins = document.createElement("span");
   const p1Name = document.createElement("p");
   const p2Marker = document.createElement("div");
+  const p2Wins = document.createElement("span");
   const p2Name = document.createElement("p");
   const vsText = document.createElement("div");
   //const svgX = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none">
@@ -256,17 +267,19 @@ const renderDOM = () => {
     main.appendChild(p1Marker);
     main.appendChild(vsText);
     main.appendChild(p2Marker);
+    p1Wins.appendChild(p1Name);
+    p2Wins.appendChild(p2Name);
     p1Marker.appendChild(p1Name);
     p2Marker.appendChild(p2Name);
-    p1Marker.innerText = "0";
+    p1Wins.innerText = "0";
     p1Name.innerText = `${players[0].name}`;
-    p2Marker.innerText = "0";
+    p2Wins.innerText = "0";
     p2Name.innerText = `${players[1].name}`;
   };
 
   function refreshMarkers(players) {
-    p1Marker.innerText = `${players[0].gamesWon}`;
-    p2Marker.innerText = `${players[1].gamesWon}`;
+    p1Wins.innerText = `${players[0].gamesWon}`;
+    p2Wins.innerText = `${players[1].gamesWon}`;
   }
 
   const gameBoard = document.createElement("div");
@@ -284,17 +297,17 @@ const renderDOM = () => {
         boardCell.innerText = `${board.getCellValue(i, j)}`;
         boardRow.appendChild(boardCell);
         boardCell.addEventListener("click", () => {
-          game.playGame(i, j);
-          boardCell.innerText = `${board.getCellValue(i, j)}`;
-          refreshMarkers(game.getPlayers());
           if (game.getStatus().winner !== "") {
-            renderWinner();
-            game.getPlayers().forEach((player) => (player.gamesWon = 0));
+            renderWinner(game);
             return;
           }
-          if (game.getStatus().gameOver === true) {
-            renderNextGame();
+          if (game.getStatus().matchOver === true) {
+            renderNextMatch(game);
+            return;
           }
+          game.playMatch(i, j);
+          boardCell.innerText = `${board.getCellValue(i, j)}`;
+          refreshMarkers(game.getPlayers());
         });
       }
     }
@@ -328,7 +341,7 @@ const renderDOM = () => {
   nextGameModal.open = false;
   nextGameModal.id = "next-game-modal";
 
-  const renderNextGame = (game) => {
+  const renderNextMatch = (game) => {
     const nextGameBtn = document.createElement("button");
     nextGameBtn.className = "dialog-btn";
     nextGameBtn.innerText = "Next game";
@@ -337,8 +350,10 @@ const renderDOM = () => {
     nextGameModal.appendChild(nextGameBtn);
     display.appendChild(nextGameModal);
     nextGameBtn.addEventListener("click", () => {
-      game.board.cleanBoard();
+      game.getBoard().cleanBoard();
       cleanRenderedBoard();
+      nextGameModal.open = "false";
+      game.changeGameOver();
     });
   };
 
@@ -347,7 +362,7 @@ const renderDOM = () => {
     renderBoard,
     renderWinner,
     cleanRenderedBoard,
-    renderNextGame,
+    renderNextMatch,
   };
 };
 
@@ -364,23 +379,23 @@ play();
 
 console.log(Gameflow().getStatus());
 // Game 1: Player 2 gamesWon
-//game.playGame(1, 2);
-//game.playGame(0, 0);
-//game.playGame(2, 2);
-//game.playGame(0, 1);
-//game.playGame(1, 1);
-//game.playGame(0, 2);
+//game.playMatch(1, 2);
+//game.playMatch(0, 0);
+//game.playMatch(2, 2);
+//game.playMatch(0, 1);
+//game.playMatch(1, 1);
+//game.playMatch(0, 2);
 //
 //// Game 2: Player 1 gamesWon
-//game.playGame(0, 0);
-//game.playGame(1, 0);
-//game.playGame(0, 1);
-//game.playGame(1, 1);
-//game.playGame(0, 2);
+//game.playMatch(0, 0);
+//game.playMatch(1, 0);
+//game.playMatch(0, 1);
+//game.playMatch(1, 1);
+//game.playMatch(0, 2);
 //
 //// Game 3: Player 2 gamesWon the match
-//game.playGame(2, 0);
-//game.playGame(0, 0);
-//game.playGame(2, 1);
-//game.playGame(0, 1);
-//game.playGame(2, 2);
+//game.playMatch(2, 0);
+//game.playMatch(0, 0);
+//game.playMatch(2, 1);
+//game.playMatch(0, 1);
+//game.playMatch(2, 2);
