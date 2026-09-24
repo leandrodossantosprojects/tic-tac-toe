@@ -62,31 +62,40 @@ function Cell() {
   };
 }
 
-const DisplayMarker = () => {
-  const renderMarkers = () => {
-    const display = document.querySelector("html");
-    const markerContainer = document.createElement("div");
-    const player1Marker = document.createElement("div");
-    const player2Marker = document.createElement("div");
-    markerContainer.innerHTML = `${player1Marker} <div class='versus'>VS</div> ${player2Marker}`;
-    player1Marker.className = "marker-p1";
-    player1Marker.innerText = "0";
-    player2Marker.className = "marker-p2";
-    player2Marker.innerText = "0";
-    display.appendChild(markerContainer);
+const renderDOM = () => {
+  const display = document.querySelector("body");
+  const main = document.createElement("main");
+  const p1Marker = document.createElement("div");
+  const p1Name = document.createElement("p");
+  const p2Marker = document.createElement("div");
+  const p2Name = document.createElement("p");
+  const vsText = document.createElement("div");
+
+  p1Marker.className = "marker";
+  p1Marker.id = "p1-marker";
+  p2Marker.className = "marker";
+  p2Marker.id = "2-marker";
+
+  vsText.innerText = "VS";
+
+  const renderMarkers = (players) => {
+    display.appendChild(main);
+    main.appendChild(p1Marker);
+    main.appendChild(vsText);
+    main.appendChild(p2Marker);
+    p1Marker.appendChild(p1Name);
+    p2Marker.appendChild(p2Name);
+    p1Marker.innerText = `${players[0].gamesWon}`;
+    p1Name.innerText = `${players[0].name}`;
+    p2Marker.innerText = `${players[1].gamesWon}`;
+    p2Name.innerText = `${players[1].name}`;
   };
 
-  return {
-    renderMarkers,
-  };
-};
+  const gameBoard = document.createElement("div");
+  gameBoard.className = "board";
 
-const DisplayBoard = () => {
-  const renderBoard = (board) => {
-    const display = document.querySelector("body");
-    const gameBoard = document.createElement("div");
+  const renderBoard = (board, game) => {
     display.appendChild(gameBoard);
-    gameBoard.className = "board";
     for (let i = 0; i < 3; i++) {
       const boardRow = document.createElement("div");
       boardRow.className = "board-row";
@@ -96,29 +105,49 @@ const DisplayBoard = () => {
         boardCell.className = "board-cell";
         boardCell.innerText = `${board.getCellValue(i, j)}`;
         boardRow.appendChild(boardCell);
+        boardCell.addEventListener("click", () => {
+          game.playGame(i, j);
+          boardCell.innerText = `${board.getCellValue(i, j)}`;
+        });
       }
     }
   };
 
+  const winnerModal = document.createElement("dialog");
+  winnerModal.open = false;
+  winnerModal.id = "win-modal";
+
+  const renderWinner = (player) => {
+    winnerModal.innerText = `${player.name} won!`;
+    winnerModal.open = true;
+    display.appendChild(winnerModal);
+  };
+
   return {
+    renderMarkers,
     renderBoard,
+    renderWinner,
   };
 };
 
 function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
   const board = Gameboard();
+  const getBoard = () => board;
   const players = [
     {
       name: playerOneName,
       token: 1,
-      wins: 0,
+      gamesWon: 0,
     },
     {
       name: playerTwoName,
       token: 2,
-      wins: 0,
+      gamesWon: 0,
     },
   ];
+  let getPlayers = () => {
+    return players;
+  };
   let activePlayer = players[0];
 
   const switchPlayerTurn = () => {
@@ -132,6 +161,7 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
   };
 
   let gameOver = false;
+  let winner;
 
   const winPlays = [
     [
@@ -185,7 +215,7 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
 
     if (move === false) return;
 
-    const winner = winPlays.some((play) => {
+    const won = winPlays.some((play) => {
       return play.every(([x, y]) => {
         return board.getCellValue(x, y) === getActivePlayer().token;
       });
@@ -196,12 +226,13 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
         .getBoard()
         .every((row) => row.every((cell) => cell.getValue() !== 0));
 
-    if (winner === true) {
+    if (won === true) {
       console.log(`${getActivePlayer().name} won this game`);
-      getActivePlayer().wins += 1;
+      getActivePlayer().gamesWon += 1;
       board.printBoard();
-      if (getActivePlayer().wins === 2) {
+      if (getActivePlayer().gamesWon === 2) {
         console.log(`${getActivePlayer().name} won this match`);
+        winner = getActivePlayer().name;
         gameOver = true;
         return;
       }
@@ -215,32 +246,46 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
     printNewRound();
   };
 
+  const getWinner = () => winner;
+
   return {
     playGame,
+    getBoard,
+    getPlayers,
     getActivePlayer,
+    getWinner,
   };
 }
 
-const game = Gameflow();
+const play = () => {
+  const game = Gameflow();
+  const board = game.getBoard();
+  const render = renderDOM();
 
-// Game 1: Player 2 wins
-game.playGame(1, 2);
-game.playGame(0, 0);
-game.playGame(2, 2);
-game.playGame(0, 1);
-game.playGame(1, 1);
-game.playGame(0, 2);
+  render.renderMarkers(game.getPlayers());
+  render.renderBoard(board, game);
+};
 
-// Game 2: Player 1 wins
-game.playGame(0, 0);
-game.playGame(1, 0);
-game.playGame(0, 1);
-game.playGame(1, 1);
-game.playGame(0, 2);
+play();
 
-// Game 3: Player 2 wins the match
-game.playGame(2, 0);
-game.playGame(0, 0);
-game.playGame(2, 1);
-game.playGame(0, 1);
-game.playGame(2, 2);
+// Game 1: Player 2 gamesWon
+//game.playGame(1, 2);
+//game.playGame(0, 0);
+//game.playGame(2, 2);
+//game.playGame(0, 1);
+//game.playGame(1, 1);
+//game.playGame(0, 2);
+//
+//// Game 2: Player 1 gamesWon
+//game.playGame(0, 0);
+//game.playGame(1, 0);
+//game.playGame(0, 1);
+//game.playGame(1, 1);
+//game.playGame(0, 2);
+//
+//// Game 3: Player 2 gamesWon the match
+//game.playGame(2, 0);
+//game.playGame(0, 0);
+//game.playGame(2, 1);
+//game.playGame(0, 1);
+//game.playGame(2, 2);
