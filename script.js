@@ -93,6 +93,7 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
   };
 
   let matchOver = false;
+  let drawMatch = false;
   let winner = "";
 
   const winPlays = [
@@ -152,7 +153,7 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
       });
     });
 
-    const drawGame = () => {
+    const draw = () => {
       board
         .getBoard()
         .every((row) => row.every((cell) => cell.getValue() !== 0));
@@ -170,10 +171,11 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
       board.cleanBoard();
       return;
     }
-    if (drawGame() === true) {
+    if (draw() === true) {
       console.log("Draw game");
       board.cleanBoard();
       matchOver = true;
+      drawGame = true;
       return;
     }
     switchPlayerTurn();
@@ -184,6 +186,7 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
     return {
       matchOver: matchOver,
       winner: winner,
+      drawMatch: drawMatch,
     };
   };
 
@@ -300,17 +303,15 @@ const renderDOM = () => {
         boardCell.innerText = `${board.getCellValue(i, j)}`;
         boardRow.appendChild(boardCell);
         boardCell.addEventListener("click", () => {
-          if (game.getStatus().winner !== "") {
-            renderWinner(game);
-            return;
-          }
-          if (game.getStatus().matchOver === true) {
-            renderNextMatch(game);
-            return;
-          }
+          if (game.getStatus().matchOver === true) return;
           game.playMatch(i, j);
           boardCell.innerText = `${board.getCellValue(i, j)}`;
           refreshMarkers(game.getPlayers());
+          if (game.getStatus().draw === true)
+            if (game.getStatus().winner !== "") {
+              renderWinner(game);
+              return;
+            }
         });
       }
     }
