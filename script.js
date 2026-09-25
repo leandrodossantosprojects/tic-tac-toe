@@ -260,6 +260,8 @@ const renderDOM = () => {
   p1Marker.id = "p1-marker";
   p2Marker.className = "marker";
   p2Marker.id = "2-marker";
+  p1Wins.className = "p1-wins";
+  p2Wins.className = "p2-wins";
 
   vsText.innerText = "VS";
 
@@ -268,8 +270,8 @@ const renderDOM = () => {
     main.appendChild(p1Marker);
     main.appendChild(vsText);
     main.appendChild(p2Marker);
-    p1Wins.appendChild(p1Name);
-    p2Wins.appendChild(p2Name);
+    p1Marker.appendChild(p1Wins);
+    p2Marker.appendChild(p2Wins);
     p1Marker.appendChild(p1Name);
     p2Marker.appendChild(p2Name);
     p1Wins.innerText = "0";
