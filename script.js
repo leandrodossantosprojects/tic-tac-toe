@@ -155,7 +155,7 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
     });
 
     const draw = () => {
-      board
+      return board
         .getBoard()
         .every((row) => row.every((cell) => cell.getValue() !== 0));
     };
@@ -225,43 +225,43 @@ const renderDOM = () => {
   const p2Wins = document.createElement("span");
   const p2Name = document.createElement("p");
   const vsText = document.createElement("div");
-  //const svgX = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none">
-  //    <path
-  //      d="M18 6L6 18M6 6l12 12"
-  //      stroke="#06b6d4"
-  //      stroke-width="2.5"
-  //      stroke-linecap="round"
-  //      stroke-linejoin="round"
-  //      filter="url(#neon-glow)"
-  //    />
-  //  </svg>`;
-  //const svgO = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none">
-  //  <circle
-  //    cx="12"
-  //    cy="12"
-  //    r="8.5"
-  //    stroke="#06b6d4"
-  //    stroke-width="2.5"
-  //    filter="url(#neon-glow)"
-  //  />
-  //</svg>`;
-  //const svgXGlow = `
-  //  <defs>
-  //    <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
-  //      <feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="#06b6d4" flood-opacity="0.9" />
-  //      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#06b6d4" flood-opacity="0.5" />
-  //    </filter>
-  //  </defs>
-  //`;
-  //const svgOGlow = `
-  //  <defs>
-  //    <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
-  //      <feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="#06b6d4" flood-opacity="0.9" />
-  //      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#06b6d4" flood-opacity="0.5" />
-  //    </filter>
-  //  </defs>
-  //
-  //`;
+  const svgX = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none">
+      <path
+        d="M18 6L6 18M6 6l12 12"
+        stroke="#06b6d4"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        filter="url(#neon-glow)"
+      />
+    </svg>`;
+  const svgO = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none">
+    <circle
+      cx="12"
+      cy="12"
+      r="8.5"
+      stroke="#06b6d4"
+      stroke-width="2.5"
+      filter="url(#neon-glow)"
+    />
+  </svg>`;
+  const svgXGlow = `
+    <defs>
+      <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
+        <feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="#06b6d4" flood-opacity="0.9" />
+        <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#06b6d4" flood-opacity="0.5" />
+      </filter>
+    </defs>
+  `;
+  const svgOGlow = `
+    <defs>
+      <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
+        <feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="#06b6d4" flood-opacity="0.9" />
+        <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#06b6d4" flood-opacity="0.5" />
+      </filter>
+    </defs>
+  
+  `;
 
   p1Marker.className = "marker";
   p1Marker.id = "p1-marker";
@@ -358,9 +358,14 @@ const renderDOM = () => {
         boardCell.innerText = ``;
         boardRow.appendChild(boardCell);
         boardCell.addEventListener("click", () => {
+          console.log(game.getGameStatus());
           if (game.getGameStatus().matchOver === true) return;
-          game.playMatch(i, j);
-          boardCell.innerText = `${board.getCellValue(i, j)}`;
+          game.playMatch(j, i);
+          if (board.getCellValue(j, i) === 1) {
+            boardCell.innerHTML = svgO;
+          } else {
+            boardCell.innerHTML = svgX;
+          }
           refreshMarkers(game.getPlayers());
           if (game.getGameStatus().winner !== "") {
             renderWinner(game);
@@ -368,6 +373,7 @@ const renderDOM = () => {
           }
           if (game.getGameStatus().matchResult !== "") {
             renderMatchOver(game);
+            console.log(game.getGameStatus());
             return;
           }
         });
