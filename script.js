@@ -399,26 +399,3 @@ const play = () => {
 };
 
 play();
-
-console.log(Gameflow().getGameStatus());
-// Game 1: Player 2 gamesWon
-//game.playMatch(1, 2);
-//game.playMatch(0, 0);
-//game.playMatch(2, 2);
-//game.playMatch(0, 1);
-//game.playMatch(1, 1);
-//game.playMatch(0, 2);
-//
-//// Game 2: Player 1 gamesWon
-//game.playMatch(0, 0);
-//game.playMatch(1, 0);
-//game.playMatch(0, 1);
-//game.playMatch(1, 1);
-//game.playMatch(0, 2);
-//
-//// Game 3: Player 2 gamesWon the match
-//game.playMatch(2, 0);
-//game.playMatch(0, 0);
-//game.playMatch(2, 1);
-//game.playMatch(0, 1);
-//game.playMatch(2, 2);
