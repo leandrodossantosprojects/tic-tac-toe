@@ -225,17 +225,20 @@ const renderDOM = () => {
   const p2Wins = document.createElement("span");
   const p2Name = document.createElement("p");
   const vsText = document.createElement("div");
-  const svgX = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M18 6L6 18M6 6l12 12"
-        stroke="#06b6d4"
-        stroke-width="2.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        filter="url(#neon-glow)"
-      />
-    </svg>`;
-  const svgO = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none">
+  const svgNS = "http://www.w3.org/2000/svg";
+  const svgX = document.createElementNS(svgNS, "svg");
+  const svgO = document.createElementNS(svgNS, "svg");
+  const pathSvgX = `
+     <path
+       d="M18 6L6 18M6 6l12 12"
+       stroke="#06b6d4"
+       stroke-width="2.5"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       filter="url(#neon-glow)"
+     />
+`;
+  const pathSvgO = `
     <circle
       cx="12"
       cy="12"
@@ -244,24 +247,34 @@ const renderDOM = () => {
       stroke-width="2.5"
       filter="url(#neon-glow)"
     />
-  </svg>`;
-  const svgXGlow = `
+`;
+  const glowSvgX = `
     <defs>
       <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
         <feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="#06b6d4" flood-opacity="0.9" />
         <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#06b6d4" flood-opacity="0.5" />
       </filter>
     </defs>
-  `;
-  const svgOGlow = `
+`;
+  const glowSvgO = `
     <defs>
       <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
         <feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="#06b6d4" flood-opacity="0.9" />
         <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#06b6d4" flood-opacity="0.5" />
       </filter>
     </defs>
-  
-  `;
+`;
+
+  svgX.setAttribute("width", "100");
+  svgX.setAttribute("height", "100");
+  svgX.setAttribute("viewBox", "0 0 24 24");
+  svgX.setAttribute("fill", "none");
+  svgO.setAttribute("width", "100");
+  svgO.setAttribute("height", "100");
+  svgO.setAttribute("viewBox", "0 0 24 24");
+  svgO.setAttribute("fill", "none");
+  svgX.innerHTML = pathSvgX;
+  svgO.innerHTML = pathSvgO;
 
   p1Marker.className = "marker";
   p1Marker.id = "p1-marker";
@@ -355,16 +368,17 @@ const renderDOM = () => {
       for (let j = 0; j < 3; j++) {
         const boardCell = document.createElement("div");
         boardCell.className = "board-cell";
-        boardCell.innerText = ``;
         boardRow.appendChild(boardCell);
         boardCell.addEventListener("click", () => {
           console.log(game.getGameStatus());
           if (game.getGameStatus().matchOver === true) return;
           game.playMatch(j, i);
           if (board.getCellValue(j, i) === 1) {
-            boardCell.innerHTML = svgO;
+            const value = svgO.cloneNode(true);
+            boardCell.appendChild(value);
           } else {
-            boardCell.innerHTML = svgX;
+            const value = svgX.cloneNode(true);
+            boardCell.appendChild(value);
           }
           refreshMarkers(game.getPlayers());
           if (game.getGameStatus().winner !== "") {
