@@ -93,7 +93,8 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
   };
 
   let matchOver = false;
-  let drawMatch = false;
+  let matchWinner = "";
+  let matchResult = "";
   let winner = "";
 
   const winPlays = [
@@ -163,40 +164,43 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
       getActivePlayer().gamesWon += 1;
       board.printBoard();
       matchOver = true;
+      matchResult = "player won";
+      matchWinner = getActivePlayer().name;
       if (getActivePlayer().gamesWon === 2) {
-        console.log(`${getActivePlayer().name} won this match`);
         winner = getActivePlayer().name;
         return;
       }
-      board.cleanBoard();
       return;
     }
     if (draw() === true) {
-      console.log("Draw game");
-      board.cleanBoard();
       matchOver = true;
-      drawGame = true;
+      matchResult = "draw";
       return;
     }
     switchPlayerTurn();
     printNewRound();
   };
 
-  const getStatus = () => {
+  const getGameStatus = () => {
     return {
       matchOver: matchOver,
+      matchWinner: matchWinner,
       winner: winner,
-      drawMatch: drawMatch,
+      matchResult: matchResult,
     };
   };
 
   const startNewMatch = () => {
     matchOver = false;
+    board.cleanBoard();
+    matchWinner = "";
+    matchResult = "";
+    switchPlayerTurn();
   };
 
   const startNewGame = () => {
-    winner = "";
     players.forEach((player) => (player.gamesWon = 0));
+    winner = "";
     startNewMatch();
   };
 
@@ -205,7 +209,7 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
     getBoard,
     getPlayers,
     getActivePlayer,
-    getStatus,
+    getGameStatus,
     startNewMatch,
     startNewGame,
   };
@@ -293,6 +297,57 @@ const renderDOM = () => {
 
   const renderBoard = (board, game) => {
     display.appendChild(gameBoard);
+    const nextMatchModal = document.createElement("dialog");
+    nextMatchModal.open = false;
+    nextMatchModal.id = "next-game-modal";
+    const nextMatchModalTxt = document.createElement("span");
+    const nextMatchBtn = document.createElement("button");
+    nextMatchBtn.className = "dialog-btn";
+    nextMatchBtn.innerText = "Next game";
+    nextMatchModal.appendChild(nextMatchModalTxt);
+    nextMatchModal.appendChild(nextMatchBtn);
+    display.appendChild(nextMatchModal);
+
+    nextMatchBtn.addEventListener("click", () => {
+      cleanRenderedBoard();
+      game.startNewMatch();
+      nextMatchModal.open = false;
+    });
+
+    const renderMatchOver = (game) => {
+      if (game.getGameStatus().matchResult === "draw") {
+        nextMatchModalTxt.innerText = `Draw Game`;
+      }
+      if (game.getGameStatus().matchResult === "player won") {
+        nextMatchModalTxt.innerText = `${game.getActivePlayer().name} won!`;
+      }
+      nextMatchModal.open = true;
+    };
+
+    const winnerModal = document.createElement("dialog");
+    winnerModal.open = false;
+    winnerModal.id = "win-modal";
+    const winnerModalTxt = document.createElement("span");
+    const nextGameBtn = document.createElement("button");
+    nextGameBtn.className = "dialog-btn";
+    nextGameBtn.innerText = "Play Again!";
+    winnerModal.appendChild(winnerModalTxt);
+    winnerModal.appendChild(nextGameBtn);
+    display.appendChild(winnerModal);
+
+    const renderWinner = (game) => {
+      winnerModalTxt.innerText = `${game.getActivePlayer().name} won!`;
+      winnerModal.open = true;
+    };
+
+    nextGameBtn.addEventListener("click", () => {
+      game.getBoard().cleanBoard();
+      cleanRenderedBoard();
+      winnerModal.open = false;
+      game.startNewGame();
+      refreshMarkers(game.getPlayers());
+    });
+
     for (let i = 0; i < 3; i++) {
       const boardRow = document.createElement("div");
       boardRow.className = "board-row";
@@ -300,18 +355,21 @@ const renderDOM = () => {
       for (let j = 0; j < 3; j++) {
         const boardCell = document.createElement("div");
         boardCell.className = "board-cell";
-        boardCell.innerText = `${board.getCellValue(i, j)}`;
+        boardCell.innerText = ``;
         boardRow.appendChild(boardCell);
         boardCell.addEventListener("click", () => {
-          if (game.getStatus().matchOver === true) return;
+          if (game.getGameStatus().matchOver === true) return;
           game.playMatch(i, j);
           boardCell.innerText = `${board.getCellValue(i, j)}`;
           refreshMarkers(game.getPlayers());
-          if (game.getStatus().draw === true)
-            if (game.getStatus().winner !== "") {
-              renderWinner(game);
-              return;
-            }
+          if (game.getGameStatus().winner !== "") {
+            renderWinner(game);
+            return;
+          }
+          if (game.getGameStatus().matchResult !== "") {
+            renderMatchOver(game);
+            return;
+          }
         });
       }
     }
@@ -324,57 +382,10 @@ const renderDOM = () => {
     }
   };
 
-  const winnerModal = document.createElement("dialog");
-  winnerModal.open = false;
-  winnerModal.id = "win-modal";
-  const winnerModalTxt = document.createElement("span");
-  const nextMatchBtn = document.createElement("button");
-  nextMatchBtn.className = "dialog-btn";
-  nextMatchBtn.innerText = "Play Again!";
-  winnerModal.appendChild(winnerModalTxt);
-  winnerModal.appendChild(nextMatchBtn);
-  display.appendChild(winnerModal);
-
-  const renderWinner = (game) => {
-    winnerModalTxt.innerText = `${game.getActivePlayer().name} won!`;
-    winnerModal.open = true;
-    nextMatchBtn.addEventListener("click", () => {
-      game.getBoard().cleanBoard();
-      cleanRenderedBoard();
-      game.startNewGame();
-      winnerModal.open = false;
-    });
-  };
-
-  const nextGameModal = document.createElement("dialog");
-  nextGameModal.open = false;
-  nextGameModal.id = "next-game-modal";
-  const nextGameModalTxt = document.createElement("span");
-  const nextGameBtn = document.createElement("button");
-  nextGameBtn.className = "dialog-btn";
-  nextGameBtn.innerText = "Next game";
-  nextGameModal.appendChild(nextGameModalTxt);
-  nextGameModal.appendChild(nextGameBtn);
-  display.appendChild(nextGameModal);
-
-  const renderNextMatch = (game) => {
-    nextGameModalTxt.innerText = `${game.getActivePlayer().name} won!`;
-    nextGameModal.open = true;
-    nextGameBtn.addEventListener("click", () => {
-      game.getBoard().cleanBoard();
-      cleanRenderedBoard();
-      nextGameModal.open = "false";
-      game.startNewMatch();
-      nextGameModal.open = false;
-    });
-  };
-
   return {
     renderMarkers,
     renderBoard,
-    renderWinner,
     cleanRenderedBoard,
-    renderNextMatch,
   };
 };
 
@@ -389,7 +400,7 @@ const play = () => {
 
 play();
 
-console.log(Gameflow().getStatus());
+console.log(Gameflow().getGameStatus());
 // Game 1: Player 2 gamesWon
 //game.playMatch(1, 2);
 //game.playMatch(0, 0);
