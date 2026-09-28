@@ -233,6 +233,7 @@ const renderDOM = () => {
        stroke-width="2"
        stroke-linecap="round"
        stroke-linejoin="round"
+       filter="url(#neon-glow)"
      />
 `;
   const pathSvgO = `
@@ -242,18 +243,36 @@ const renderDOM = () => {
       r="8.5"
       stroke="#ffffff"
       stroke-width="2"
+      filter="url(#neon-glow)"
     />
 `;
   const glow = `
   <defs>
     <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
       <feDropShadow dx="0" dy="0" stdDeviation="2.5"
-        flood-color="#2dfe54" flood-opacity="0.9" />
+        flood-color="#ffffff" flood-opacity="0.9" />
       <feDropShadow dx="0" dy="0" stdDeviation="5"
-        flood-color="#2dfe54" flood-opacity="0.5" />
+        flood-color="#ffffff" flood-opacity="0.5" />
     </filter>
   </defs>
 `;
+
+  function changeFilterColor(color) {
+    const filtersColors = document.getElementsByTagName("feDropShadow");
+    for (let i = 0; i < filtersColors.length; i++) {
+      console.log(filtersColors[i]);
+      filtersColors[i].setAttribute("flood-color", color);
+    }
+    console.log(filtersColors);
+  }
+
+  function changeSvgColor(color) {
+    const svgs = document.getElementsByTagName("svg");
+    console.log(svgs);
+    for (let i = 0; i < svgs.length; i++) {
+      svgs[i].childNodes[1].setAttribute("stroke", color);
+    }
+  }
 
   const filtersSvg = document.createElementNS(svgNS, "svg");
   filtersSvg.innerHTML = glow;
@@ -316,11 +335,11 @@ const renderDOM = () => {
     main.appendChild(gameBoard);
     const nextMatchModal = document.createElement("dialog");
     nextMatchModal.open = false;
-    nextMatchModal.id = "next-game-modal";
+    nextMatchModal.id = "next-match";
     const nextMatchModalTxt = document.createElement("span");
     const nextMatchBtn = document.createElement("button");
     nextMatchBtn.className = "dialog-btn";
-    nextMatchBtn.innerText = "Next game";
+    nextMatchBtn.innerText = "Next match";
     nextMatchModal.appendChild(nextMatchModalTxt);
     nextMatchModal.appendChild(nextMatchBtn);
     display.appendChild(nextMatchModal);
@@ -328,12 +347,17 @@ const renderDOM = () => {
     nextMatchBtn.addEventListener("click", () => {
       cleanRenderedBoard();
       game.startNewMatch();
-      nextMatchModal.open = false;
+      nextMatchModal.close();
+      changeFilterColor("ffffff");
+      changeSvgColor("ffffff");
     });
 
     const renderMatchOver = (game) => {
       if (game.getGameStatus().matchResult === "draw") {
         nextMatchModalTxt.innerText = `Draw Game`;
+        const drawColor = "#f80e0b";
+        changeFilterColor(drawColor);
+        changeSvgColor(drawColor);
       }
       if (game.getGameStatus().matchResult === "player won") {
         const winningPlay = game.getGameStatus().winningPlay;
@@ -343,12 +367,12 @@ const renderDOM = () => {
           const token = document.getElementById(
             "cell-" + coordinate,
           ).firstChild;
-          token.firstElementChild.setAttribute("filter", "url(#neon-glow)");
           token.firstElementChild.setAttribute("stroke", winningColor);
+          changeFilterColor(winningColor);
         });
         nextMatchModalTxt.innerText = `${game.getActivePlayer().name} won!`;
       }
-      nextMatchModal.open = true;
+      nextMatchModal.showModal();
     };
 
     const winnerModal = document.createElement("dialog");
