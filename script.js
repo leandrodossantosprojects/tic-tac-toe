@@ -87,11 +87,6 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
   };
   const getActivePlayer = () => activePlayer;
 
-  const printNewRound = () => {
-    board.printBoard();
-    console.log(`${getActivePlayer().name}'s turn.`);
-  };
-
   let matchOver = false;
   let matchWinner = "";
   let matchResult = "";
@@ -145,7 +140,6 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
     //Verify if game is over
     if (matchOver === true) return;
 
-    console.log(`${getActivePlayer().name} select a empty cell`);
     let move = board.selectCell(row, column, getActivePlayer().token);
     if (move === false) return;
 
@@ -180,7 +174,6 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
       return;
     }
     switchPlayerTurn();
-    printNewRound();
   };
 
   const getGameStatus = () => {
@@ -222,6 +215,7 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
 const renderDOM = () => {
   const display = document.querySelector("body");
   const main = document.createElement("main");
+  const markersCont = document.createElement("div");
   const p1Marker = document.createElement("div");
   const p1Wins = document.createElement("span");
   const p1Name = document.createElement("p");
@@ -235,8 +229,8 @@ const renderDOM = () => {
   const pathSvgX = `
      <path
        d="M18 6L6 18M6 6l12 12"
-       stroke="#06b6d4"
-       stroke-width="2.5"
+       stroke="#ffffff"
+       stroke-width="2"
        stroke-linecap="round"
        stroke-linejoin="round"
      />
@@ -246,58 +240,60 @@ const renderDOM = () => {
       cx="12"
       cy="12"
       r="8.5"
-      stroke="#06b6d4"
-      stroke-width="2.5"
+      stroke="#ffffff"
+      stroke-width="2"
     />
 `;
   const glow = `
   <defs>
     <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
       <feDropShadow dx="0" dy="0" stdDeviation="2.5"
-        flood-color="#06b6d4" flood-opacity="0.9" />
+        flood-color="#2dfe54" flood-opacity="0.9" />
       <feDropShadow dx="0" dy="0" stdDeviation="5"
-        flood-color="#06b6d4" flood-opacity="0.5" />
+        flood-color="#2dfe54" flood-opacity="0.5" />
     </filter>
   </defs>
 `;
 
   const filtersSvg = document.createElementNS(svgNS, "svg");
   filtersSvg.innerHTML = glow;
-  display.appendChild(filtersSvg);
-  //  const glowSvgO = `
-  //    <defs>
-  //      <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
-  //        <feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="#06b6d4" flood-opacity="0.9" />
-  //        <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#06b6d4" flood-opacity="0.5" />
-  //      </filter>
-  //    </defs>
-  //`;
+  filtersSvg.class = "glow-svg";
+  filtersSvg.setAttribute("width", "0");
+  filtersSvg.setAttribute("height", "0");
+  filtersSvg.style.position = "absolute";
+  filtersSvg.style.overflow = "hidden";
 
-  svgX.setAttribute("width", "100");
-  svgX.setAttribute("height", "100");
+  document.body.appendChild(filtersSvg);
+
   svgX.setAttribute("viewBox", "0 0 24 24");
   svgX.setAttribute("fill", "none");
-  svgO.setAttribute("width", "100");
-  svgO.setAttribute("height", "100");
   svgO.setAttribute("viewBox", "0 0 24 24");
   svgO.setAttribute("fill", "none");
+  svgO.class = "token";
+  svgX.class = "token";
   svgX.innerHTML = pathSvgX;
   svgO.innerHTML = pathSvgO;
 
+  markersCont.className = "markers";
   p1Marker.className = "marker";
   p1Marker.id = "p1-marker";
   p2Marker.className = "marker";
-  p2Marker.id = "2-marker";
-  p1Wins.className = "p1-wins";
-  p2Wins.className = "p2-wins";
-
+  p2Marker.id = "p2-marker";
+  p1Wins.className = "wins";
+  p2Wins.className = "wins";
+  p1Wins.id = "p1-wins";
+  p2Wins.id = "p2-wins";
+  p1Name.className = "name";
+  p2Name.className = "name";
+  vsText.className = "vs";
   vsText.innerText = "VS";
 
   const renderMarkers = (players) => {
     display.appendChild(main);
-    main.appendChild(p1Marker);
-    main.appendChild(vsText);
-    main.appendChild(p2Marker);
+    main.appendChild(markersCont);
+    markersCont.appendChild(p1Marker);
+    markersCont.appendChild(vsText);
+    markersCont.appendChild(p2Marker);
     p1Marker.appendChild(p1Wins);
     p2Marker.appendChild(p2Wins);
     p1Marker.appendChild(p1Name);
@@ -317,7 +313,7 @@ const renderDOM = () => {
   gameBoard.className = "board";
 
   const renderBoard = (board, game) => {
-    display.appendChild(gameBoard);
+    main.appendChild(gameBoard);
     const nextMatchModal = document.createElement("dialog");
     nextMatchModal.open = false;
     nextMatchModal.id = "next-game-modal";
@@ -341,13 +337,14 @@ const renderDOM = () => {
       }
       if (game.getGameStatus().matchResult === "player won") {
         const winningPlay = game.getGameStatus().winningPlay;
-        console.log(winningPlay);
+        const winningColor = "#2dfe54";
         winningPlay.forEach((cell) => {
           const coordinate = `${cell[0]}-${cell[1]}`;
           const token = document.getElementById(
             "cell-" + coordinate,
           ).firstChild;
           token.firstElementChild.setAttribute("filter", "url(#neon-glow)");
+          token.firstElementChild.setAttribute("stroke", winningColor);
         });
         nextMatchModalTxt.innerText = `${game.getActivePlayer().name} won!`;
       }
@@ -380,19 +377,20 @@ const renderDOM = () => {
 
     for (let i = 0; i < 3; i++) {
       const boardRow = document.createElement("div");
-      boardRow.className = "board-row";
+      boardRow.className = "row";
       gameBoard.appendChild(boardRow);
       for (let j = 0; j < 3; j++) {
         const boardCell = document.createElement("div");
-        boardCell.className = "board-cell";
+        boardCell.className = "cell";
         coordinates = `${i}-${j}`;
         boardCell.id = `cell-${coordinates}`;
         boardRow.appendChild(boardCell);
         boardCell.addEventListener("click", () => {
-          console.log(game.getGameStatus());
-          console.log(boardCell);
           if (game.getGameStatus().matchOver === true) return;
           game.playMatch(i, j);
+          if (boardCell.innerHTML !== "") {
+            return;
+          }
           if (board.getCellValue(i, j) === 1) {
             const value = svgO.cloneNode(true);
             boardCell.appendChild(value);
@@ -407,7 +405,6 @@ const renderDOM = () => {
           }
           if (game.getGameStatus().matchResult !== "") {
             renderMatchOver(game);
-            console.log(game.getGameStatus());
             return;
           }
         });
@@ -416,7 +413,7 @@ const renderDOM = () => {
   };
 
   const cleanRenderedBoard = () => {
-    const cells = document.getElementsByClassName("board-cell");
+    const cells = document.getElementsByClassName("cell");
     for (let i = 0; i < cells.length; i++) {
       cells[i].innerHTML = "";
     }
