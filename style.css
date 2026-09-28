@@ -1,7 +1,6 @@
 * {
   margin: 0;
   box-sizing: border-box;
-  border: 1px red dashed;
   color: white;
 }
 
@@ -27,6 +26,7 @@ main {
   justify-items: center;
   align-items: center;
   align-content: stretch;
+  width: 30%;
 }
 
 .marker {
@@ -35,14 +35,19 @@ main {
 
 .wins {
   font-size: 6rem;
+  text-shadow:
+    0 0 4px white,
+    0 0 10px white;
 }
 
 .name {
   font-size: 2rem;
+  text-shadow: 0 0 4px white;
 }
 
 .vs {
   font-size: 2rem;
+  text-shadow: 0 0 4px white;
 }
 
 .board {
@@ -74,4 +79,50 @@ main {
 .token {
   width: 100%;
   aspect-ratio: 1;
+}
+
+#next-match {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%);
+  z-index: 1000;
+  height: 200px;
+  width: 300px;
+  background-color: black;
+  border: 3px solid white;
+  box-shadow: 0 0 8px 3px white;
+  font-size: 2rem;
+  text-align: center;
+  text-shadow: 0 0 4px white;
+}
+
+#next-match[open] {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+#next-match::backdrop {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+button {
+  background-color: black;
+  color: white;
+  font-weight: bold;
+  border: 2px solid white;
+  box-shadow: 0 0 5px white;
+  transition: 0.5s;
+  outline: none;
+}
+
+button:hover {
+  background-color: white;
+  color: black;
+  box-shadow:
+    0 0 5px 5px white,
+    0 0 10px white,
+    0 0 30px white,
+    0 0 60px white;
 }
