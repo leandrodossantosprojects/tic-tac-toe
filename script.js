@@ -96,6 +96,7 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
   let matchWinner = "";
   let matchResult = "";
   let winner = "";
+  let winningPlay = [];
 
   const winPlays = [
     [
@@ -148,7 +149,7 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
     let move = board.selectCell(row, column, getActivePlayer().token);
     if (move === false) return;
 
-    const won = winPlays.some((play) => {
+    const won = winPlays.find((play) => {
       return play.every(([x, y]) => {
         return board.getCellValue(x, y) === getActivePlayer().token;
       });
@@ -160,12 +161,13 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
         .every((row) => row.every((cell) => cell.getValue() !== 0));
     };
 
-    if (won === true) {
+    if (won) {
       getActivePlayer().gamesWon += 1;
       board.printBoard();
       matchOver = true;
       matchResult = "player won";
-      matchWinner = getActivePlayer().name;
+      matchWinner = getActivePlayer();
+      winningPlay = won;
       if (getActivePlayer().gamesWon === 2) {
         winner = getActivePlayer().name;
         return;
@@ -185,6 +187,7 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
     return {
       matchOver: matchOver,
       matchWinner: matchWinner,
+      winningPlay: winningPlay,
       winner: winner,
       matchResult: matchResult,
     };
@@ -195,6 +198,7 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
     board.cleanBoard();
     matchWinner = "";
     matchResult = "";
+    winningPlay = null;
     switchPlayerTurn();
   };
 
@@ -235,7 +239,6 @@ const renderDOM = () => {
        stroke-width="2.5"
        stroke-linecap="round"
        stroke-linejoin="round"
-       filter="url(#neon-glow)"
      />
 `;
   const pathSvgO = `
@@ -245,25 +248,30 @@ const renderDOM = () => {
       r="8.5"
       stroke="#06b6d4"
       stroke-width="2.5"
-      filter="url(#neon-glow)"
     />
 `;
-  const glowSvgX = `
-    <defs>
-      <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
-        <feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="#06b6d4" flood-opacity="0.9" />
-        <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#06b6d4" flood-opacity="0.5" />
-      </filter>
-    </defs>
+  const glow = `
+  <defs>
+    <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="0" stdDeviation="2.5"
+        flood-color="#06b6d4" flood-opacity="0.9" />
+      <feDropShadow dx="0" dy="0" stdDeviation="5"
+        flood-color="#06b6d4" flood-opacity="0.5" />
+    </filter>
+  </defs>
 `;
-  const glowSvgO = `
-    <defs>
-      <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
-        <feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="#06b6d4" flood-opacity="0.9" />
-        <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#06b6d4" flood-opacity="0.5" />
-      </filter>
-    </defs>
-`;
+
+  const filtersSvg = document.createElementNS(svgNS, "svg");
+  filtersSvg.innerHTML = glow;
+  display.appendChild(filtersSvg);
+  //  const glowSvgO = `
+  //    <defs>
+  //      <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
+  //        <feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="#06b6d4" flood-opacity="0.9" />
+  //        <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#06b6d4" flood-opacity="0.5" />
+  //      </filter>
+  //    </defs>
+  //`;
 
   svgX.setAttribute("width", "100");
   svgX.setAttribute("height", "100");
@@ -332,6 +340,15 @@ const renderDOM = () => {
         nextMatchModalTxt.innerText = `Draw Game`;
       }
       if (game.getGameStatus().matchResult === "player won") {
+        const winningPlay = game.getGameStatus().winningPlay;
+        console.log(winningPlay);
+        winningPlay.forEach((cell) => {
+          const coordinate = `${cell[0]}-${cell[1]}`;
+          const token = document.getElementById(
+            "cell-" + coordinate,
+          ).firstChild;
+          token.firstElementChild.setAttribute("filter", "url(#neon-glow)");
+        });
         nextMatchModalTxt.innerText = `${game.getActivePlayer().name} won!`;
       }
       nextMatchModal.open = true;
@@ -368,12 +385,15 @@ const renderDOM = () => {
       for (let j = 0; j < 3; j++) {
         const boardCell = document.createElement("div");
         boardCell.className = "board-cell";
+        coordinates = `${i}-${j}`;
+        boardCell.id = `cell-${coordinates}`;
         boardRow.appendChild(boardCell);
         boardCell.addEventListener("click", () => {
           console.log(game.getGameStatus());
+          console.log(boardCell);
           if (game.getGameStatus().matchOver === true) return;
-          game.playMatch(j, i);
-          if (board.getCellValue(j, i) === 1) {
+          game.playMatch(i, j);
+          if (board.getCellValue(i, j) === 1) {
             const value = svgO.cloneNode(true);
             boardCell.appendChild(value);
           } else {
