@@ -348,8 +348,8 @@ const renderDOM = () => {
       cleanRenderedBoard();
       game.startNewMatch();
       nextMatchModal.close();
-      changeFilterColor("ffffff");
-      changeSvgColor("ffffff");
+      changeFilterColor("#ffffff");
+      changeSvgColor("#ffffff");
     });
 
     const renderMatchOver = (game) => {
