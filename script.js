@@ -288,8 +288,8 @@ const renderDOM = () => {
   svgX.setAttribute("fill", "none");
   svgO.setAttribute("viewBox", "0 0 24 24");
   svgO.setAttribute("fill", "none");
-  svgO.class = "token";
-  svgX.class = "token";
+  svgO.setAttribute("class", "token");
+  svgX.setAttribute("class", "token");
   svgX.innerHTML = pathSvgX;
   svgO.innerHTML = pathSvgO;
 
