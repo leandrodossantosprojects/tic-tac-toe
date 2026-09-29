@@ -85,7 +85,8 @@ main {
   aspect-ratio: 1;
 }
 
-#next-match {
+#next-match,
+#win-modal {
   position: absolute;
   top: 20%;
   left: 50%;
@@ -95,20 +96,47 @@ main {
   width: 300px;
   background-color: black;
   border: 3px solid white;
-  box-shadow: 0 0 8px 3px white;
+  box-shadow: 0 0 5px white;
+  transition: box-shadow 5s ease-out;
   font-size: 2rem;
   text-align: center;
   text-shadow: 0 0 4px white;
 }
 
-#next-match[open] {
+#next-match[open],
+#win-modal[open] {
   display: flex;
   flex-direction: column;
   justify-content: space-around;
+  box-shadow:
+    0 0 5px white,
+    0 0 25px white,
+    0 0 50px white,
+    0 0 100px white;
 }
 
+@starting-style {
+  #next-match[open],
+  #win-modal[open] {
+    box-shadow: 0 0 8px 3px white;
+  }
+}
+
+#win-modal::backdrop,
 #next-match::backdrop {
-  background-color: rgba(0, 0, 0, 0.2);
+  animation-name: dimmedBackdrop;
+  animation-duration: 5s;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+}
+
+@keyframes dimmedBackdrop {
+  from {
+    background-color: rgba(0, 0, 0, 0);
+  }
+  to {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
 }
 
 button {
