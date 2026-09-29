@@ -85,6 +85,7 @@ main {
   aspect-ratio: 1;
 }
 
+#new-name-modal,
 #next-match,
 #win-modal {
   position: absolute;
@@ -101,6 +102,30 @@ main {
   font-size: 2rem;
   text-align: center;
   text-shadow: 0 0 4px white;
+}
+
+#new-name-modal[open] {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  box-shadow: 0 0 5px white;
+}
+
+#name-input {
+  outline: none;
+  background: white;
+  color: black;
+  box-shadow:
+    0 0 5px white,
+    0 0 15px white,
+    0 0 30px white;
+  border: none;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+#new-name-modal button {
+  font-size: 1rem;
 }
 
 #next-match[open],
