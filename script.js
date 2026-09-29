@@ -233,9 +233,9 @@ const renderDOM = () => {
        stroke-width="2"
        stroke-linecap="round"
        stroke-linejoin="round"
-       filter="url(#neon-glow)"
+       filter="url(#white-glow)"
      />
-`;
+  `;
   const pathSvgO = `
     <circle
       cx="12"
@@ -243,46 +243,92 @@ const renderDOM = () => {
       r="8.5"
       stroke="#ffffff"
       stroke-width="2"
-      filter="url(#neon-glow)"
+      filter="url(#white-glow)"
     />
-`;
-  const glow = `
+  `;
+  const whiteGlow = `
   <defs>
-    <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
+    <filter id="white-glow" x="-50%" y="-50%" width="200%" height="200%">
       <feDropShadow dx="0" dy="0" stdDeviation="2.5"
         flood-color="#ffffff" flood-opacity="0.9" />
       <feDropShadow dx="0" dy="0" stdDeviation="5"
         flood-color="#ffffff" flood-opacity="0.5" />
     </filter>
   </defs>
-`;
+  `;
+  const greenGlow = `
+  <defs>
+    <filter id="green-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="0" stdDeviation="2.5"
+        flood-color="#2dfe54" flood-opacity="0.9" />
+      <feDropShadow dx="0" dy="0" stdDeviation="5"
+        flood-color="#2dfe54" flood-opacity="0.5" />
+    </filter>
+  </defs>
+  `;
+  const redGlow = `
+  <defs>
+    <filter id="red-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="0" stdDeviation="2.5"
+        flood-color="#f80e0b" flood-opacity="0.9" />
+      <feDropShadow dx="0" dy="0" stdDeviation="5"
+        flood-color="#f80e0b" flood-opacity="0.5" />
+    </filter>
+  </defs>
+  `;
 
-  function changeFilterColor(color) {
-    const filtersColors = document.getElementsByTagName("feDropShadow");
-    for (let i = 0; i < filtersColors.length; i++) {
-      console.log(filtersColors[i]);
-      filtersColors[i].setAttribute("flood-color", color);
+  function changeFilterDrawGame() {
+    const tokens = document.getElementsByClassName("token");
+    for (let i = 0; i < tokens.length; i++) {
+      console.log(tokens[i]);
+      const path = tokens[i].childNodes[1];
+      path.setAttribute("filter", "url(#red-glow)");
     }
-    console.log(filtersColors);
+  }
+
+  function changeFilterWonGame(play) {
+    const winningColor = "#2dfe54";
+    play.forEach((cell) => {
+      const coordinate = `${cell[0]}-${cell[1]}`;
+      const token = document.getElementById("cell-" + coordinate).firstChild;
+      token.firstElementChild.setAttribute("stroke", winningColor);
+      token.firstElementChild.setAttribute("filter", "url(#green-glow)");
+    });
   }
 
   function changeSvgColor(color) {
     const svgs = document.getElementsByTagName("svg");
-    console.log(svgs);
     for (let i = 0; i < svgs.length; i++) {
       svgs[i].childNodes[1].setAttribute("stroke", color);
     }
   }
 
-  const filtersSvg = document.createElementNS(svgNS, "svg");
-  filtersSvg.innerHTML = glow;
-  filtersSvg.class = "glow-svg";
-  filtersSvg.setAttribute("width", "0");
-  filtersSvg.setAttribute("height", "0");
-  filtersSvg.style.position = "absolute";
-  filtersSvg.style.overflow = "hidden";
+  const whiteGlowFilter = document.createElementNS(svgNS, "svg");
+  whiteGlowFilter.innerHTML = whiteGlow;
+  whiteGlowFilter.class = "white-glow-filter";
+  whiteGlowFilter.setAttribute("width", "0");
+  whiteGlowFilter.setAttribute("height", "0");
+  whiteGlowFilter.style.position = "absolute";
+  whiteGlowFilter.style.overflow = "hidden";
+  document.body.appendChild(whiteGlowFilter);
 
-  document.body.appendChild(filtersSvg);
+  const redGlowFilter = document.createElementNS(svgNS, "svg");
+  redGlowFilter.innerHTML = redGlow;
+  redGlowFilter.class = "red-glow-filter";
+  redGlowFilter.setAttribute("width", "0");
+  redGlowFilter.setAttribute("height", "0");
+  redGlowFilter.style.position = "absolute";
+  redGlowFilter.style.overflow = "hidden";
+  document.body.appendChild(redGlowFilter);
+
+  const greenGlowFilter = document.createElementNS(svgNS, "svg");
+  greenGlowFilter.innerHTML = greenGlow;
+  greenGlowFilter.class = "green-glow-filter";
+  greenGlowFilter.setAttribute("width", "0");
+  greenGlowFilter.setAttribute("height", "0");
+  greenGlowFilter.style.position = "absolute";
+  greenGlowFilter.style.overflow = "hidden";
+  document.body.appendChild(greenGlowFilter);
 
   svgX.setAttribute("viewBox", "0 0 24 24");
   svgX.setAttribute("fill", "none");
@@ -333,6 +379,7 @@ const renderDOM = () => {
 
   const renderBoard = (board, game) => {
     main.appendChild(gameBoard);
+
     const nextMatchModal = document.createElement("dialog");
     nextMatchModal.open = false;
     nextMatchModal.id = "next-match";
@@ -348,7 +395,6 @@ const renderDOM = () => {
       cleanRenderedBoard();
       game.startNewMatch();
       nextMatchModal.close();
-      changeFilterColor("#ffffff");
       changeSvgColor("#ffffff");
     });
 
@@ -356,20 +402,12 @@ const renderDOM = () => {
       if (game.getGameStatus().matchResult === "draw") {
         nextMatchModalTxt.innerText = `Draw Game`;
         const drawColor = "#f80e0b";
-        changeFilterColor(drawColor);
+        changeFilterDrawGame();
         changeSvgColor(drawColor);
       }
       if (game.getGameStatus().matchResult === "player won") {
         const winningPlay = game.getGameStatus().winningPlay;
-        const winningColor = "#2dfe54";
-        winningPlay.forEach((cell) => {
-          const coordinate = `${cell[0]}-${cell[1]}`;
-          const token = document.getElementById(
-            "cell-" + coordinate,
-          ).firstChild;
-          token.firstElementChild.setAttribute("stroke", winningColor);
-          changeFilterColor(winningColor);
-        });
+        changeFilterWonGame(winningPlay);
         nextMatchModalTxt.innerText = `${game.getActivePlayer().name} won!`;
       }
       nextMatchModal.showModal();
@@ -387,6 +425,8 @@ const renderDOM = () => {
     display.appendChild(winnerModal);
 
     const renderWinner = (game) => {
+      const winningPlay = game.getGameStatus().winningPlay;
+      changeFilterWonGame(winningPlay);
       winnerModalTxt.innerText = `${game.getActivePlayer().name} won!`;
       winnerModal.open = true;
     };
@@ -397,6 +437,7 @@ const renderDOM = () => {
       winnerModal.open = false;
       game.startNewGame();
       refreshMarkers(game.getPlayers());
+      changeSvgColor("#ffffff");
     });
 
     for (let i = 0; i < 3; i++) {
@@ -412,6 +453,7 @@ const renderDOM = () => {
         boardCell.addEventListener("click", () => {
           if (game.getGameStatus().matchOver === true) return;
           game.playMatch(i, j);
+          console.log(game.getGameStatus());
           if (boardCell.innerHTML !== "") {
             return;
           }
