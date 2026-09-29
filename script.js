@@ -70,16 +70,24 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
       name: playerOneName,
       token: 1,
       gamesWon: 0,
+      changePlayerName: function (newName) {
+        this.name = newName;
+      },
     },
     {
       name: playerTwoName,
       token: 2,
       gamesWon: 0,
+      changePlayerName: function (newName) {
+        this.name = newName;
+      },
     },
   ];
+
   let getPlayers = () => {
     return players;
   };
+
   let activePlayer = players[0];
 
   const switchPlayerTurn = () => {
@@ -215,14 +223,96 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
 const renderDOM = () => {
   const display = document.querySelector("body");
   const main = document.createElement("main");
-  const markersCont = document.createElement("div");
-  const p1Marker = document.createElement("div");
-  const p1Wins = document.createElement("span");
-  const p1Name = document.createElement("p");
-  const p2Marker = document.createElement("div");
-  const p2Wins = document.createElement("span");
-  const p2Name = document.createElement("p");
-  const vsText = document.createElement("div");
+  const renderMarkers = (players) => {
+    const markersCont = document.createElement("div");
+    const p1Marker = document.createElement("div");
+    const p1Wins = document.createElement("span");
+    const p1Name = document.createElement("p");
+    const p2Marker = document.createElement("div");
+    const p2Wins = document.createElement("span");
+    const p2Name = document.createElement("p");
+    const vsText = document.createElement("div");
+
+    const newNameModal = document.createElement("dialog");
+    const newNameInput = document.createElement("input");
+    const newNameBtn = document.createElement("button");
+
+    newNameModal.open = false;
+    newNameModal.id = "new-name-modal";
+    newNameInput.id = "name-input";
+    newNameInput.setAttribute("type", "text");
+    newNameBtn.id = "name-submit";
+    newNameBtn.innerText = "Change name";
+
+    display.appendChild(main);
+    main.appendChild(markersCont);
+    markersCont.appendChild(p1Marker);
+    markersCont.appendChild(vsText);
+    markersCont.appendChild(p2Marker);
+    p1Marker.appendChild(p1Wins);
+    p2Marker.appendChild(p2Wins);
+    p1Marker.appendChild(p1Name);
+    p2Marker.appendChild(p2Name);
+
+    const syncNames = () => {
+      p1Name.innerText = `${players[0].name}`;
+      p2Name.innerText = `${players[1].name}`;
+    };
+
+    syncNames();
+    p1Wins.innerText = "0";
+    p2Wins.innerText = "0";
+
+    newNameModal.appendChild(newNameInput);
+    newNameModal.appendChild(newNameBtn);
+    display.appendChild(newNameModal);
+
+    let playerForNameChange = "";
+
+    p1Name.addEventListener("click", () => {
+      newNameModal.open = true;
+      newNameInput.value = p1Name.innerText;
+      playerForNameChange = "p1";
+    });
+    p2Name.addEventListener("click", () => {
+      newNameModal.open = true;
+      newNameInput.value = p2Name.innerText;
+      playerForNameChange = "p2";
+    });
+
+    newNameBtn.addEventListener("click", () => {
+      if (playerForNameChange === "p1") {
+        players[0].changePlayerName(newNameInput.value);
+        playerForNameChange = "";
+      }
+      if (playerForNameChange === "p2") {
+        players[1].changePlayerName(newNameInput.value);
+        playerForNameChange = "";
+      }
+      syncNames();
+      newNameModal.open = false;
+    });
+
+    markersCont.className = "markers";
+    p1Marker.className = "marker";
+    p1Marker.id = "p1-marker";
+    p2Marker.className = "marker";
+    p2Marker.id = "p2-marker";
+    p1Wins.className = "wins";
+    p2Wins.className = "wins";
+    p1Wins.id = "p1-wins";
+    p2Wins.id = "p2-wins";
+    p1Name.className = "name";
+    p2Name.className = "name";
+    vsText.className = "vs";
+    vsText.innerText = "VS";
+  };
+
+  function refreshMarkers(players) {
+    p1Wins.innerText = `${players[0].gamesWon}`;
+    p2Wins.innerText = `${players[1].gamesWon}`;
+  }
+
   const svgNS = "http://www.w3.org/2000/svg";
   const svgX = document.createElementNS(svgNS, "svg");
   const svgO = document.createElementNS(svgNS, "svg");
@@ -338,41 +428,6 @@ const renderDOM = () => {
   svgX.setAttribute("class", "token");
   svgX.innerHTML = pathSvgX;
   svgO.innerHTML = pathSvgO;
-
-  markersCont.className = "markers";
-  p1Marker.className = "marker";
-  p1Marker.id = "p1-marker";
-  p2Marker.className = "marker";
-  p2Marker.id = "p2-marker";
-  p1Wins.className = "wins";
-  p2Wins.className = "wins";
-  p1Wins.id = "p1-wins";
-  p2Wins.id = "p2-wins";
-  p1Name.className = "name";
-  p2Name.className = "name";
-  vsText.className = "vs";
-  vsText.innerText = "VS";
-
-  const renderMarkers = (players) => {
-    display.appendChild(main);
-    main.appendChild(markersCont);
-    markersCont.appendChild(p1Marker);
-    markersCont.appendChild(vsText);
-    markersCont.appendChild(p2Marker);
-    p1Marker.appendChild(p1Wins);
-    p2Marker.appendChild(p2Wins);
-    p1Marker.appendChild(p1Name);
-    p2Marker.appendChild(p2Name);
-    p1Wins.innerText = "0";
-    p1Name.innerText = `${players[0].name}`;
-    p2Wins.innerText = "0";
-    p2Name.innerText = `${players[1].name}`;
-  };
-
-  function refreshMarkers(players) {
-    p1Wins.innerText = `${players[0].gamesWon}`;
-    p2Wins.innerText = `${players[1].gamesWon}`;
-  }
 
   const gameBoard = document.createElement("div");
   gameBoard.className = "board";
