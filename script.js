@@ -98,7 +98,7 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
   let matchOver = false;
   let matchWinner = "";
   let matchResult = "";
-  let winner = "";
+  let winner;
   let winningPlay = [];
 
   const winPlays = [
@@ -171,7 +171,8 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
       matchWinner = getActivePlayer();
       winningPlay = won;
       if (getActivePlayer().gamesWon === 2) {
-        winner = getActivePlayer().name;
+        matchResult = "game won";
+        winner = getActivePlayer();
         return;
       }
       return;
@@ -309,6 +310,8 @@ const renderDOM = () => {
   };
 
   function refreshMarkers(players) {
+    const p1Wins = document.getElementById("p1-wins");
+    const p2Wins = document.getElementById("p2-wins");
     p1Wins.innerText = `${players[0].gamesWon}`;
     p2Wins.innerText = `${players[1].gamesWon}`;
   }
@@ -479,10 +482,25 @@ const renderDOM = () => {
     winnerModal.appendChild(nextGameBtn);
     display.appendChild(winnerModal);
 
+    function markersChangeColor() {
+      const p1Marker = document.getElementById("p1-marker");
+      const p2Marker = document.getElementById("p2-marker");
+      const winner = game.getGameStatus().winner;
+      if (winner.token === 1) {
+        p1Marker.setAttribute("color", "#2dfe54");
+        p2Marker.setAttribute("color", "#f80e0b");
+      } else if (winner.token === 2) {
+        p2Marker.setAttribute("color", "#2dfe54");
+        p1Marker.setAttribute("color", "#f80e0b");
+      } else return;
+    }
+
     const renderWinner = (game) => {
       const winningPlay = game.getGameStatus().winningPlay;
+      const winner = game.getGameStatus().winner;
       changeFilterWonGame(winningPlay);
-      winnerModalTxt.innerText = `${game.getActivePlayer().name} won!`;
+      markersChangeColor();
+      winnerModalTxt.innerText = `${winner.name} won!`;
       winnerModal.open = true;
     };
 
@@ -493,6 +511,10 @@ const renderDOM = () => {
       game.startNewGame();
       refreshMarkers(game.getPlayers());
       changeSvgColor("#ffffff");
+      const p1Marker = document.getElementById("p1-marker");
+      const p2Marker = document.getElementById("p2-marker");
+      p1Marker.setAttribute("color", "#ffffff");
+      p2Marker.setAttribute("color", "#ffffff");
     });
 
     for (let i = 0; i < 3; i++) {
@@ -520,7 +542,7 @@ const renderDOM = () => {
             boardCell.appendChild(value);
           }
           refreshMarkers(game.getPlayers());
-          if (game.getGameStatus().winner !== "") {
+          if (game.getGameStatus().matchResult === "game won") {
             renderWinner(game);
             return;
           }
