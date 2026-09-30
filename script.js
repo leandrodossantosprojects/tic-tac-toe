@@ -224,6 +224,31 @@ function Gameflow(playerOneName = "Player 1", playerTwoName = "Player 2") {
 const renderDOM = () => {
   const display = document.querySelector("body");
   const main = document.createElement("main");
+
+  const renderStart = (game) => {
+    const start = document.createElement("dialog");
+    const startTitle = document.createElement("h1");
+    const startDesc = document.createElement("p");
+    const startBtn = document.createElement("button");
+    start.id = "start";
+    startTitle.id = "title";
+    startDesc.id = "desc";
+    startBtn.id = "start-btn";
+    startTitle.innerText = "Tic-Tac-Toe";
+    startDesc.innerText =
+      "Welcome to a classic tic-tac-toe game with neon style. Click the players name to change them";
+    startBtn.innerText = "Play";
+    startBtn.addEventListener("click", () => {
+      game.startNewGame();
+      start.close();
+    });
+    start.appendChild(startTitle);
+    start.appendChild(startDesc);
+    start.appendChild(startBtn);
+    display.appendChild(start);
+    start.showModal();
+  };
+
   const renderMarkers = (players) => {
     const markersCont = document.createElement("div");
     const p1Marker = document.createElement("div");
@@ -238,7 +263,6 @@ const renderDOM = () => {
     const newNameInput = document.createElement("input");
     const newNameBtn = document.createElement("button");
 
-    newNameModal.open = false;
     newNameModal.id = "new-name-modal";
     newNameInput.id = "name-input";
     newNameInput.setAttribute("type", "text");
@@ -271,12 +295,12 @@ const renderDOM = () => {
     let playerForNameChange = "";
 
     p1Name.addEventListener("click", () => {
-      newNameModal.open = true;
+      newNameModal.showModal();
       newNameInput.value = p1Name.innerText;
       playerForNameChange = "p1";
     });
     p2Name.addEventListener("click", () => {
-      newNameModal.open = true;
+      newNameModal.showModal();
       newNameInput.value = p2Name.innerText;
       playerForNameChange = "p2";
     });
@@ -291,7 +315,7 @@ const renderDOM = () => {
         playerForNameChange = "";
       }
       syncNames();
-      newNameModal.open = false;
+      newNameModal.close();
     });
 
     markersCont.className = "markers";
@@ -579,6 +603,7 @@ const renderDOM = () => {
   };
 
   return {
+    renderStart,
     renderMarkers,
     renderBoard,
     cleanRenderedBoard,
@@ -590,6 +615,7 @@ const play = () => {
   const board = game.getBoard();
   const render = renderDOM();
 
+  render.renderStart(game);
   render.renderMarkers(game.getPlayers());
   render.renderBoard(board, game);
 };

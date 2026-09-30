@@ -19,6 +19,15 @@ main {
   justify-items: center;
 }
 
+#title,
+.wins,
+.name,
+.vs {
+  text-shadow:
+    0 0 8px white,
+    0 0 20px white;
+}
+
 .markers {
   display: grid;
   grid-template-columns: 2fr 1fr 2fr;
@@ -35,30 +44,22 @@ main {
 
 .wins {
   font-size: 6rem;
-  text-shadow:
-    0 0 8px white,
-    0 0 20px white;
 }
 
 .name {
   font-size: 2rem;
-  text-shadow:
-    0 0 8px white,
-    0 0 20px white;
 }
 
 .vs {
   font-size: 2rem;
-  text-shadow:
-    0 0 8px white,
-    0 0 20px white;
+  text-shadow:;
 }
 
 .board {
   display: grid;
   grid-template-rows: repeat(3, minmax(0, 1fr));
   gap: 1px;
-  margin-top: 10%;
+  margin-top: 5%;
   height: 70%;
   aspect-ratio: 1/1;
   border: 1px solid white;
@@ -79,7 +80,7 @@ main {
 .cell {
   background-color: black;
   border: 1px solid white;
-  box-shadow: 0 0 8px 3px inset;
+  box-shadow: 0 0 8px 3px inset white;
   min-width: 0;
   min-height: 0;
 }
@@ -89,6 +90,7 @@ main {
   aspect-ratio: 1;
 }
 
+#start,
 #new-name-modal,
 #next-match,
 #win-modal {
@@ -97,8 +99,6 @@ main {
   left: 50%;
   transform: translate(-50%);
   z-index: 1000;
-  height: 200px;
-  width: 300px;
   background-color: black;
   border: 3px solid white;
   box-shadow: 0 0 5px white;
@@ -107,6 +107,17 @@ main {
   text-align: center;
   text-shadow: 0 0 4px white;
   color: white;
+}
+
+#new-name-modal,
+#next-match,
+#win-modal {
+  height: 200px;
+  width: 300px;
+}
+
+#start {
+  height: 50%;
 }
 
 #new-name-modal[open] {
@@ -129,15 +140,13 @@ main {
   font-weight: bold;
 }
 
-#new-name-modal button {
-  font-size: 1rem;
-}
-
+#start[open],
 #next-match[open],
 #win-modal[open] {
   display: flex;
   flex-direction: column;
   justify-content: space-around;
+  align-items: center;
   box-shadow:
     0 0 5px white,
     0 0 25px white,
@@ -152,12 +161,17 @@ main {
   }
 }
 
+#new-name-modal::backdrop,
 #win-modal::backdrop,
 #next-match::backdrop {
   animation-name: dimmedBackdrop;
   animation-duration: 5s;
   animation-timing-function: ease-out;
   animation-fill-mode: forwards;
+}
+
+#start::backdrop {
+  background-color: rgba(0, 0, 0, 0.99);
 }
 
 @keyframes dimmedBackdrop {
@@ -169,6 +183,12 @@ main {
   }
 }
 
+#start-btn {
+  width: 40%;
+  height: 15%;
+  font-size: 2rem;
+}
+
 button {
   background-color: black;
   color: white;
@@ -177,6 +197,7 @@ button {
   box-shadow: 0 0 5px white;
   transition: 0.5s;
   outline: none;
+  font-size: 1rem;
 }
 
 button:hover {
