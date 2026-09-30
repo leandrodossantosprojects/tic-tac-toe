@@ -1,7 +1,6 @@
 * {
   margin: 0;
   box-sizing: border-box;
-  color: white;
 }
 
 body {
@@ -27,6 +26,7 @@ main {
   align-items: center;
   align-content: stretch;
   width: 30%;
+  color: white;
 }
 
 .marker {
@@ -36,18 +36,22 @@ main {
 .wins {
   font-size: 6rem;
   text-shadow:
-    0 0 4px white,
-    0 0 10px white;
+    0 0 8px white,
+    0 0 20px white;
 }
 
 .name {
   font-size: 2rem;
-  text-shadow: 0 0 4px white;
+  text-shadow:
+    0 0 8px white,
+    0 0 20px white;
 }
 
 .vs {
   font-size: 2rem;
-  text-shadow: 0 0 4px white;
+  text-shadow:
+    0 0 8px white,
+    0 0 20px white;
 }
 
 .board {
@@ -102,6 +106,7 @@ main {
   font-size: 2rem;
   text-align: center;
   text-shadow: 0 0 4px white;
+  color: white;
 }
 
 #new-name-modal[open] {

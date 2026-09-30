@@ -486,12 +486,23 @@ const renderDOM = () => {
       const p1Marker = document.getElementById("p1-marker");
       const p2Marker = document.getElementById("p2-marker");
       const winner = game.getGameStatus().winner;
+      const textShadowWon = "0 0 8px #2dfe54, 0 0 20px #2dfe54";
+      const textShadowLose = "0 0 8px #f80e0b, 0 0 20px #f80e0b";
+      console.log(winner);
       if (winner.token === 1) {
-        p1Marker.setAttribute("color", "#2dfe54");
-        p2Marker.setAttribute("color", "#f80e0b");
+        p1Marker.style.color = "#2dfe54";
+        p1Marker.childNodes[0].style.textShadow = textShadowWon;
+        p1Marker.childNodes[1].style.textShadow = textShadowWon;
+        p2Marker.style.color = "#f80e0b";
+        p2Marker.childNodes[0].style.textShadow = textShadowLose;
+        p2Marker.childNodes[1].style.textShadow = textShadowLose;
       } else if (winner.token === 2) {
-        p2Marker.setAttribute("color", "#2dfe54");
-        p1Marker.setAttribute("color", "#f80e0b");
+        p2Marker.style.color = "#2dfe54";
+        p2Marker.childNodes[0].style.textShadow = textShadowWon;
+        p2Marker.childNodes[1].style.textShadow = textShadowWon;
+        p1Marker.style.color = "#f80e0b";
+        p1Marker.childNodes[0].style.textShadow = textShadowLose;
+        p1Marker.childNodes[1].style.textShadow = textShadowLose;
       } else return;
     }
 
@@ -513,8 +524,13 @@ const renderDOM = () => {
       changeSvgColor("#ffffff");
       const p1Marker = document.getElementById("p1-marker");
       const p2Marker = document.getElementById("p2-marker");
-      p1Marker.setAttribute("color", "#ffffff");
-      p2Marker.setAttribute("color", "#ffffff");
+      const textShadow = "0 0 8px white, 0 0 20px white";
+      p1Marker.style.color = "#ffffff";
+      p2Marker.style.color = "#ffffff";
+      p1Marker.childNodes[0].style.textShadow = textShadow;
+      p1Marker.childNodes[1].style.textShadow = textShadow;
+      p2Marker.childNodes[0].style.textShadow = textShadow;
+      p2Marker.childNodes[1].style.textShadow = textShadow;
     });
 
     for (let i = 0; i < 3; i++) {
